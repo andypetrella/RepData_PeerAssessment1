@@ -13,13 +13,14 @@ summary(data)
 ## What is mean total number of steps taken per day?
 ```{r}
 library(ggplot2)
-qplot(steps, data=data, geom='histogram')
+qplot(steps, data=data, geom='histogram', binwidth = 40)
 #not clear if we have to cut by day...
 #mn <- aggregate(steps ~ cut(data$date, "day"), data=data, FUN=mean, na.rm=T)
 #md <- aggregate(steps ~ cut(data$date, "day"), data=data, FUN=median, na.rm=T)
-print(paste("Mean steps per day is ", mean(data$steps, na.rm=T)))
-print(paste("Median steps per day is ", median(data$steps, na.rm=T)))
 ```
+
+Mean steps per day is `r mean(data$steps, na.rm=T)`.
+Median steps per day is `r median(data$steps, na.rm=T)`.
 
 
 ## What is the average daily activity pattern?
@@ -32,16 +33,15 @@ plot(mean.by.5$interval, mean.by.5$mn, type = "n")
 lines(mean.by.5$interval, mean.by.5$mn)
 max.point <- mean.by.5[which(mean.by.5$mn == max(mean.by.5$mn)), ]
 points(max.point, pch=4, cex=2, col="red")
-print(paste("5'-interval with max steps in avg across all days:", max.point$interval, "with ", max.point$mn, "steps in average", sep=" "))
 ```
 
+5'-interval with max steps in avg across all days: `r max.point$interval` with `r max.point$mn` steps in average.
 
 ## Imputing missing values
-```{r}
-print(paste("Number of rows with NAs is", sum(!is.na(data$steps)), sep=" "))
-```
+Number of rows with NAs is `r sum(!is.na(data$steps))`.
+
 We're going to fill the gaps following the simplest way:
-missing value for a the `x`th 5 minutes interval in a day will got the mean of all the non `NA`s values for this interval.
+missing value for a the `x`th 5 minutes interval in a day will got the mean of all the non `r NA`s values for this interval.
 
 ```{r}
 data$steps.completed <- data$steps
@@ -52,14 +52,20 @@ for (m in levels(mean.by.5$interval)) {
   data[idx, ]$steps.completed <- v
   after <- data[idx, ]$steps.completed
 }
-print(paste("Now the number of NAs is", sum(is.na(data$steps.completed)), sep=" "))
+```
+
+Now the number of NAs is `r sum(is.na(data$steps.completed))`.
+
+
+```{r}
 qplot(steps.completed, data=data, geom='histogram')
 #not clear if we have to cut by day...
 #mn <- aggregate(steps ~ cut(data$date, "day"), data=data, FUN=mean, na.rm=T)
 #md <- aggregate(steps ~ cut(data$date, "day"), data=data, FUN=median, na.rm=T)
-print(paste("Mean steps per day is ", mean(data$steps.completed, na.rm=T)))
-print(paste("Median steps per day is ", median(data$steps.completed, na.rm=T)))
 ```
+
+Mean steps per day is `r mean(data$steps.completed, na.rm=T)`.
+Median steps per day is `r median(data$steps.completed, na.rm=T)`.
 
 The mean and median doesn't change most probably because the data is skewed at 0 steps (median invariant) and we used the mean to fulfill the missing values (the mean invariant).
 
